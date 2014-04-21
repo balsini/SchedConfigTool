@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>xsd/schema.xsd</file>
+        <file>img/logo_sssup.png</file>
+        <file>img/logo_unipi.png</file>
     </qresource>
 </RCC>

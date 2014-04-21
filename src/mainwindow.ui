@@ -19,6 +19,24 @@
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <widget class="QToolBox" name="Algorithm">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>250</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
@@ -27,8 +45,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>266</width>
-           <height>250</height>
+           <width>250</width>
+           <height>245</height>
           </rect>
          </property>
          <attribute name="label">
@@ -157,8 +175,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>275</width>
-           <height>250</height>
+           <width>146</width>
+           <height>49</height>
           </rect>
          </property>
          <attribute name="label">
@@ -261,7 +279,7 @@
      <x>0</x>
      <y>0</y>
      <width>558</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
