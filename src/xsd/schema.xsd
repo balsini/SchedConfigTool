@@ -1,0 +1,15 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="SchedulingAlgorithm">
+    <xs:complexType>
+	  <xs:choice>
+        <xs:sequence>
+          <xs:element type="xs:integer" name="period"/>
+          <xs:element type="xs:integer" name="deadline"/>
+          <xs:element type="xs:integer" name="runtime"/>
+        </xs:sequence>
+		<xs:element type="xs:integer" name="responsetime"/>
+      </xs:choice>
+      <xs:attribute type="xs:string" name="name"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
