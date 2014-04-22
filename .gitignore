@@ -1,10 +1,14 @@
+# Qt-SDK generated files
 src/SchedConfigTool.pro.user
+src/Makefile
+src/moc_*
 
 # Compiled Object files
 *.slo
 *.lo
 *.o
 *.obj
+src/SchedConfigTool
 
 # Compiled Dynamic libraries
 *.so
