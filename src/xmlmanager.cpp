@@ -15,7 +15,7 @@ void parseFeedback(QXmlStreamReader &xml, SchedParameter &sp)
         if(xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "responsetime") {
                 xml.readNext();
-                sp.setResponseTime(xml.text().toLong());
+                sp.setResponseTime(xml.text().toString().toLong());
                 setResponseTime = true;
             }
         }
@@ -42,15 +42,15 @@ void parseDL(QXmlStreamReader &xml, SchedParameter &sp)
         if(xml.tokenType() == QXmlStreamReader::StartElement) {
             if (xml.name() == "period") {
                 xml.readNext();
-                sp.setPeriod(xml.text().toLong());
+                sp.setPeriod(xml.text().toString().toLong());
                 setPeriod = true;
             } else if (xml.name() == "runtime") {
                 xml.readNext();
-                sp.setRunTime(xml.text().toLong());
+                sp.setRunTime(xml.text().toString().toLong());
                 setRunTime = true;
             } else if (xml.name() == "deadline") {
                 xml.readNext();
-                sp.setDeadline(xml.text().toLong());
+                sp.setDeadline(xml.text().toString().toLong());
                 setDeadline = true;
             }
         }
