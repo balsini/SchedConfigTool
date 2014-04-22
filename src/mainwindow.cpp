@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEditResponseTime->setValidator(new QIntValidator(this));
     ui->lineEditRunTime->setValidator(new QIntValidator(this));
 
+    ui->plainEditorTab->setCurrentIndex(0);
     ui->Algorithm->setCurrentIndex(0);
     emit ui->Algorithm->currentChanged(0);
 
