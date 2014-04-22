@@ -1,7 +1,9 @@
 # Qt-SDK generated files
 src/SchedConfigTool.pro.user
 src/Makefile
-src/moc_*
+src/moc_*.cpp
+src/ui_*.h
+src/qrc_*.cpp
 
 # Compiled Object files
 *.slo
