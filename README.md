@@ -19,9 +19,9 @@ Qt SDK.
 
 Reach the project folder.
 
-$ cd src
-$ qmake -o Makefile SchedConfigTool.pro
-$ make
+* $ cd src
+* $ qmake -o Makefile SchedConfigTool.pro
+* $ make
 
 
 =======
