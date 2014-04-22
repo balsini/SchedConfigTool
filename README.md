@@ -30,4 +30,4 @@ Reach the project folder.
 
 After succesful compiling.
 
-$ ./SchedConfigTool &
+* $ ./SchedConfigTool &
