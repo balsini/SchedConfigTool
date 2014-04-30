@@ -17,13 +17,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     xmlmanager.cpp \
-    aboutwindow.cpp
+    aboutwindow.cpp \
+    jsonmanager.cpp
 
 HEADERS  += \
     types.hpp \
     xmlmanager.hpp \
     mainwindow.h \
-    aboutwindow.h
+    aboutwindow.h \
+    jsonmanager.hpp
 
 FORMS    += mainwindow.ui \
     aboutwindow.ui

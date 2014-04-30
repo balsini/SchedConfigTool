@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "xmlmanager.hpp"
+#include "jsonmanager.hpp"
 
 #include <QDebug>
 #include <QXmlSchema>
@@ -50,30 +51,49 @@ void MainWindow::changedParameter()
   }
 
   ui->plainXMLEditor->setPlainText(constructXMLString(sp));
+  ui->plainJSONEditor->setPlainText(constructJSONString(sp));
+}
+
+void MainWindow::updateGUIParameters(const SchedParameter &sp)
+{
+  qDebug() << "Updating GUI parameters";
+
+  if (sp.isValid()) {
+    switch(sp.getType()) {
+      case SCHED_DEADLINE:
+
+        std::cout << sp;
+
+        ui->lineEditDeadline->setText(QString::number(sp.getDeadline()));
+        ui->lineEditPeriod->setText(QString::number(sp.getPeriod()));
+        ui->lineEditRunTime->setText(QString::number(sp.getRunTime()));
+        ui->lineEditPriority->setText(QString::number(sp.getPriority()));
+        ui->Algorithm->setCurrentIndex(0);
+        break;
+      case QoS_Feedback:
+
+        std::cout << sp;
+
+        ui->lineEditResponseTime->setText(QString::number(sp.getResponseTime()));
+        ui->Algorithm->setCurrentIndex(1);
+        break;
+      default: break;
+    }
+  }
 }
 
 void MainWindow::changedXML()
 {
-  if (validXML()) {
-    SchedParameter sp = parseXMLString(ui->plainXMLEditor->toPlainText());
+  qDebug() << "changedXML()";
+  if (validXML())
+    updateGUIParameters(parseXMLString(ui->plainXMLEditor->toPlainText()));
+}
 
-    if (sp.isValid()) {
-      switch(sp.getType()) {
-        case SCHED_DEADLINE:
-          ui->lineEditDeadline->setText(QString::number(sp.getDeadline()));
-          ui->lineEditPeriod->setText(QString::number(sp.getPeriod()));
-          ui->lineEditRunTime->setText(QString::number(sp.getRunTime()));
-          ui->lineEditPriority->setText(QString::number(sp.getPriority()));
-          ui->Algorithm->setCurrentIndex(0);
-          break;
-        case QoS_Feedback:
-          ui->lineEditResponseTime->setText(QString::number(sp.getResponseTime()));
-          ui->Algorithm->setCurrentIndex(1);
-          break;
-        default: break;
-      }
-    }
-  }
+void MainWindow::changedJSON()
+{
+  qDebug() << "changedJSON()";
+  if (validJSON())
+    updateGUIParameters(parseJSONString(ui->plainJSONEditor->toPlainText()));
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -84,6 +104,15 @@ void MainWindow::on_actionQuit_triggered()
 void MainWindow::on_actionAbout_triggered()
 {
   about.show();
+}
+
+bool MainWindow::validJSON()
+{
+  /////////////////////
+  /// TODO
+  /////////////////////
+
+  return true;
 }
 
 bool MainWindow::validXML()
@@ -171,7 +200,7 @@ void MainWindow::on_actionOpen_triggered()
                           this,
                           tr("Open File"),
                           "./",
-                          "All files (*.*);;XML File (*.xml);;Text File (*.txt)"
+                          "XML File (*.xml);;JSON File (*.json);;Text File (*.txt)"
                           );
 
   QFile openFile(tmpfilename);
@@ -186,25 +215,33 @@ void MainWindow::on_actionOpen_triggered()
   }
 }
 
+void MainWindow::saveTo(const QString &tmpfilename) {
+  QFile openFile(tmpfilename);
+  if (openFile.open(QIODevice::WriteOnly)) {
+    filename = tmpfilename;
+    ui->statusbar->showMessage("Saved: " + filename);
+
+    if (tmpfilename.right(4) == ".xml")
+      openFile.write(ui->plainXMLEditor->toPlainText().toUtf8());
+    else if (tmpfilename.right(5) == ".json")
+      openFile.write(ui->plainJSONEditor->toPlainText().toUtf8());
+
+    updateTitle();
+    openFile.close();
+  } else {
+    qDebug() << "Error while opening file";
+  }
+}
+
 void MainWindow::on_actionSave_As_triggered()
 {
   QString tmpfilename = QFileDialog::getSaveFileName(
                           this,
                           tr("Save File"),
                           "./",
-                          "All files (*.*);;XML File (*.xml);;Text File (*.txt)"
+                          "XML File (*.xml);;JSON File (*.json);;Text File (*.txt)"
                           );
-
-  QFile openFile(tmpfilename);
-  if (openFile.open(QIODevice::WriteOnly)) {
-    filename = tmpfilename;
-    ui->statusbar->showMessage("Saved: " + filename);
-    openFile.write(ui->plainXMLEditor->toPlainText().toUtf8());
-    updateTitle();
-    openFile.close();
-  } else {
-    qDebug() << "Error while opening file";
-  }
+  saveTo(tmpfilename);
 }
 
 void MainWindow::on_actionSave_triggered()
@@ -215,17 +252,8 @@ void MainWindow::on_actionSave_triggered()
                     this,
                     tr("Save File"),
                     "./",
-                    "All files (*.*);;XML File (*.xml);;Text File (*.txt)"
+                    "XML File (*.xml);;JSON File (*.json);;Text File (*.txt)"
                     );
   }
-  QFile openFile(tmpfilename);
-  if (openFile.open(QIODevice::WriteOnly)) {
-    filename = tmpfilename;
-    ui->statusbar->showMessage("Saved: " + filename);
-    openFile.write(ui->plainXMLEditor->toPlainText().toUtf8());
-    updateTitle();
-    openFile.close();
-  } else {
-    qDebug() << "Error while opening file";
-  }
+  saveTo(tmpfilename);
 }

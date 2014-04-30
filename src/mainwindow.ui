@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>558</width>
-    <height>365</height>
+    <width>769</width>
+    <height>435</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
            <x>0</x>
            <y>0</y>
            <width>250</width>
-           <height>245</height>
+           <height>315</height>
           </rect>
          </property>
          <attribute name="label">
@@ -207,7 +207,7 @@
            <x>0</x>
            <y>0</y>
            <width>250</width>
-           <height>245</height>
+           <height>315</height>
           </rect>
          </property>
          <attribute name="label">
@@ -276,7 +276,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="plainEditorTab">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -333,7 +333,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>558</width>
+     <width>769</width>
      <height>20</height>
     </rect>
    </property>
@@ -471,8 +471,8 @@
    <slot>changedParameter()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>62</x>
-     <y>114</y>
+     <x>71</x>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -512,9 +512,26 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>plainJSONEditor</sender>
+   <signal>textChanged()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>changedJSON()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>439</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>326</x>
+     <y>409</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>changedParameter()</slot>
   <slot>changedXML()</slot>
+  <slot>changedJSON()</slot>
  </slots>
 </ui>

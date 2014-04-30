@@ -1,6 +1,7 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
+#include <iostream>
 
 enum scheduler_type {
   SCHED_DEADLINE,
@@ -65,6 +66,24 @@ public:
   long int getPriority() const { return _priority; }
   long int getPeriod() const { return _period; }
   long int getResponseTime() const { return _responsetime; }
+
+  friend std::ostream &operator<<(std::ostream &o, const SchedParameter &sp) {
+    switch (sp.getType()) {
+      case SCHED_DEADLINE:
+        o << "SCHED_DEADLINE" << std::endl;
+        o << "deadline: " << sp.getDeadline() << std::endl;
+        o << "period: " << sp.getPeriod() << std::endl;
+        o << "runtime: " << sp.getRunTime() << std::endl;
+        o << "priority: " << sp.getPriority() << std::endl;
+        break;
+      case QoS_Feedback:
+        o << "QoS_Feedback" << std::endl;
+        o << "responsetime: " << sp.getResponseTime() << std::endl;
+        break;
+      default: break;
+    }
+    return o;
+  }
 };
 
 #endif // TYPES_HPP
