@@ -14,7 +14,7 @@ Qt SDK.
 
 
 ==============
- COMPILATION
+ COMPILING
 ==============
 
 Reach the project folder.
