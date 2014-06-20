@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent) :
   ui->lineEditPeriod->setValidator(new QIntValidator(this));
   ui->lineEditResponseTime->setValidator(new QIntValidator(this));
   ui->lineEditRunTime->setValidator(new QIntValidator(this));
-  ui->lineEditPriority->setValidator(new QIntValidator(this));
+  //ui->lineEditPriority->setValidator(new QIntValidator(this));
 
   ui->plainEditorTab->setCurrentIndex(0);
   ui->Algorithm->setCurrentIndex(0);
@@ -44,10 +44,13 @@ void MainWindow::changedParameter()
       sp.setParam(ui->lineEditPeriod->text().toLong(),
                   ui->lineEditDeadline->text().toLong(),
                   ui->lineEditRunTime->text().toLong(),
-                  ui->lineEditPriority->text().toLong());
+                  ui->lineEditPath->text(),
+                  ui->lineEditArgs->text());
       break;
     default:
-      sp.setParam(ui->lineEditResponseTime->text().toLong());
+      sp.setParam(ui->lineEditResponseTime->text().toLong(),
+                  ui->lineEditPath->text(),
+                  ui->lineEditArgs->text());
   }
 
   ui->plainXMLEditor->setPlainText(constructXMLString(sp));
@@ -67,7 +70,10 @@ void MainWindow::updateGUIParameters(const SchedParameter &sp)
         ui->lineEditDeadline->setText(QString::number(sp.getDeadline()));
         ui->lineEditPeriod->setText(QString::number(sp.getPeriod()));
         ui->lineEditRunTime->setText(QString::number(sp.getRunTime()));
-        ui->lineEditPriority->setText(QString::number(sp.getPriority()));
+        //ui->lineEditPriority->setText(QString::number(sp.getPriority()));
+        ui->lineEditPath->setText(sp.getPath());
+        ui->lineEditArgs->setText(sp.getArgs());
+
         ui->Algorithm->setCurrentIndex(0);
         break;
       case QoS_Feedback:
@@ -75,6 +81,8 @@ void MainWindow::updateGUIParameters(const SchedParameter &sp)
         std::cout << sp;
 
         ui->lineEditResponseTime->setText(QString::number(sp.getResponseTime()));
+        ui->lineEditPath->setText(sp.getPath());
+        ui->lineEditArgs->setText(sp.getArgs());
         ui->Algorithm->setCurrentIndex(1);
         break;
       default: break;

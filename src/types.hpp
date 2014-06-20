@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <QString>
+
 enum scheduler_type {
   SCHED_DEADLINE,
   QoS_Feedback
@@ -13,6 +15,8 @@ class SchedParameter {
 
   scheduler_type _type;
 
+  QString _path;
+  QString _args;
   long int _deadline;
   long int _priority;
   long int _runtime;
@@ -21,33 +25,45 @@ class SchedParameter {
 
 public:
   SchedParameter() :
-    _valid(false) {}
-  SchedParameter(long int period, long int deadline, long int runtime) :
+    _valid(false), _priority(0) {}
+  SchedParameter(long int period, long int deadline, long int runtime, QString path, QString args) :
     _valid(true),
     _type(SCHED_DEADLINE),
     _deadline(deadline),
+    _priority(0),
     _runtime(runtime),
-    _period(period) {}
-  SchedParameter(long int responsetime) :
+    _period(period)
+  {
+    _path = path;
+    _args = args;
+  }
+  SchedParameter(long int responsetime, QString path, QString args) :
     _valid(true),
     _type(QoS_Feedback),
-    _responsetime(responsetime) {}
+    _responsetime(responsetime)
+  {
+    _path = path;
+    _args = args;
+  }
 
-  void setParam(long int period, long int deadline, long int runtime, long int priority)
+  void setParam(long int period, long int deadline, long int runtime, QString path, QString args)
   {
     _valid = true;
     _type = SCHED_DEADLINE;
     _deadline = deadline;
     _runtime = runtime;
     _period = period;
-    _priority = priority;
+    _path = path;
+    _args = args;
   }
 
-  void setParam(long int responsetime)
+  void setParam(long int responsetime, QString path, QString args)
   {
     _valid = true;
     _type = QoS_Feedback;
     _responsetime = responsetime;
+    _path = path;
+    _args = args;
   }
 
   scheduler_type getType() const { return _type; }
@@ -60,12 +76,16 @@ public:
   void setPriority(long int priority) { _priority = priority; }
   void setRunTime(long int runtime) { _runtime = runtime; }
   void setResponseTime(long int responsetime) { _responsetime = responsetime; }
+  void setPath(QString path) { _path = path; }
+  void setArgs(QString args) { _args = args; }
 
   long int getDeadline() const { return _deadline; }
   long int getRunTime() const { return _runtime; }
   long int getPriority() const { return _priority; }
   long int getPeriod() const { return _period; }
   long int getResponseTime() const { return _responsetime; }
+  QString getPath() const { return _path; }
+  QString getArgs() const { return _args; }
 
   friend std::ostream &operator<<(std::ostream &o, const SchedParameter &sp) {
     switch (sp.getType()) {
@@ -82,6 +102,8 @@ public:
         break;
       default: break;
     }
+    o << "path: " << sp.getPath().toStdString() << std::endl;
+    o << "args: " << sp.getArgs().toStdString() << std::endl;
     return o;
   }
 };

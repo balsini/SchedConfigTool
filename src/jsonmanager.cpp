@@ -21,6 +21,8 @@ SchedParameter parseJSONString(const QString &str)
       bool setDeadline = false;
       bool setRunTime = false;
       bool setPriority = false;
+      bool setPath = false;
+      bool setArgs = false;
 
       sp.setType(SCHED_DEADLINE);
 
@@ -40,6 +42,14 @@ SchedParameter parseJSONString(const QString &str)
         sp.setPriority(item.value("priority").toInt());
         setPriority = true;
       }
+      if (item.value("path") != QJsonValue::Undefined ) {
+        sp.setPath(item.value("path").toString());
+        setPath = true;
+      }
+      if (item.value("args") != QJsonValue::Undefined ) {
+        sp.setArgs(item.value("args").toString());
+        setArgs = true;
+      }
 
       if (!setPeriod)
         sp.setPeriod(0);
@@ -49,11 +59,17 @@ SchedParameter parseJSONString(const QString &str)
         sp.setRunTime(0);
       if (!setPriority)
         sp.setPriority(0);
+      if (!setPath)
+        sp.setPath("");
+      if (!setArgs)
+        sp.setArgs("");
 
       sp.isValid(true);
 
     } else if (item.value("policy").toString() == "QoS_Feedback") {
       bool setResponseTime = false;
+      bool setPath = false;
+      bool setArgs = false;
 
       sp.setType(QoS_Feedback);
 
@@ -61,9 +77,21 @@ SchedParameter parseJSONString(const QString &str)
         sp.setResponseTime(item.value("responsetime").toInt());
         setResponseTime = true;
       }
+      if (item.value("path") != QJsonValue::Undefined ) {
+        sp.setPath(item.value("path").toString());
+        setPath = true;
+      }
+      if (item.value("args") != QJsonValue::Undefined ) {
+        sp.setArgs(item.value("args").toString());
+        setArgs = true;
+      }
 
       if (!setResponseTime)
         sp.setResponseTime(0);
+      if (!setPath)
+        sp.setPath("");
+      if (!setArgs)
+        sp.setArgs("");
 
       sp.isValid(true);
     }
@@ -83,10 +111,22 @@ QString constructJSONString(const SchedParameter &sp)
       jsonObj.insert("deadline", QJsonValue((int)sp.getDeadline()));
       jsonObj.insert("runtime", QJsonValue((int)sp.getRunTime()));
       jsonObj.insert("priority", QJsonValue((int)sp.getPriority()));
+
+      if (sp.getPath().length() > 0) {
+        jsonObj.insert("path", QJsonValue(sp.getPath()));
+        jsonObj.insert("args", QJsonValue(sp.getArgs()));
+      }
+
       jsonObj.insert("policy", QString("SCHED_DEADLINE"));
       break;
     case QoS_Feedback:
       jsonObj.insert("responsetime", QJsonValue((int)sp.getResponseTime()));
+
+      if (sp.getPath().length() > 0) {
+        jsonObj.insert("path", QJsonValue(sp.getPath()));
+        jsonObj.insert("args", QJsonValue(sp.getArgs()));
+      }
+
       jsonObj.insert("policy", QString("QoS_Feedback"));
       break;
     default: break;

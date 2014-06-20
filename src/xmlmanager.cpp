@@ -8,6 +8,8 @@ void parseFeedback(QXmlStreamReader &xml, SchedParameter &sp)
   qDebug("Found QoS_Feedback Configuration");
 
   bool setResponseTime = false;
+  bool setPath = false;
+  bool setArgs = false;
 
   sp.setType(QoS_Feedback);
   while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
@@ -17,6 +19,14 @@ void parseFeedback(QXmlStreamReader &xml, SchedParameter &sp)
         xml.readNext();
         sp.setResponseTime(xml.text().toString().toLong());
         setResponseTime = true;
+      } else if (xml.name() == "path") {
+        xml.readNext();
+        sp.setPath(xml.text().toString());
+        setPath = true;
+      } else if (xml.name() == "args") {
+        xml.readNext();
+        sp.setArgs(xml.text().toString());
+        setArgs = true;
       }
     }
     xml.readNext();
@@ -24,6 +34,10 @@ void parseFeedback(QXmlStreamReader &xml, SchedParameter &sp)
 
   if (!setResponseTime)
     sp.setResponseTime(0);
+  if (!setPath)
+    sp.setPath("");
+  if (!setArgs)
+    sp.setArgs("");
 
   sp.isValid(true);
 }
@@ -35,7 +49,8 @@ void parseDL(QXmlStreamReader &xml, SchedParameter &sp)
   bool setPeriod = false;
   bool setDeadline = false;
   bool setRunTime = false;
-  bool setPriority = false;
+  bool setPath = false;
+  bool setArgs = false;
 
   sp.setType(SCHED_DEADLINE);
   while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
@@ -53,10 +68,18 @@ void parseDL(QXmlStreamReader &xml, SchedParameter &sp)
         xml.readNext();
         sp.setDeadline(xml.text().toString().toLong());
         setDeadline = true;
-      } else if (xml.name() == "priority") {
+        //} else if (xml.name() == "priority") {
+        //  xml.readNext();
+        //  sp.setPriority(xml.text().toString().toLong());
+        //  setPriority = true;
+      } else if (xml.name() == "path") {
         xml.readNext();
-        sp.setPriority(xml.text().toString().toLong());
-        setPriority = true;
+        sp.setPath(xml.text().toString());
+        setPath = true;
+      } else if (xml.name() == "args") {
+        xml.readNext();
+        sp.setArgs(xml.text().toString());
+        setArgs = true;
       }
     }
     xml.readNext();
@@ -68,8 +91,10 @@ void parseDL(QXmlStreamReader &xml, SchedParameter &sp)
     sp.setDeadline(0);
   if (!setRunTime)
     sp.setRunTime(0);
-  if (!setPriority)
-    sp.setPriority(0);
+  if (!setPath)
+    sp.setPath("");
+  if (!setArgs)
+    sp.setArgs("");
 
   sp.isValid(true);
 }
@@ -120,13 +145,25 @@ QString constructXMLString(const SchedParameter &sp)
   switch (sp.getType()) {
     case SCHED_DEADLINE:
       stream.writeAttribute("name", "SCHED_DEADLINE");
+
+      if (sp.getPath().length() > 0) {
+        stream.writeTextElement("path", sp.getPath());
+        stream.writeTextElement("args", sp.getArgs());
+      }
+
       stream.writeTextElement("period", QString::number(sp.getPeriod()));
       stream.writeTextElement("deadline", QString::number(sp.getDeadline()));
       stream.writeTextElement("runtime", QString::number(sp.getRunTime()));
-      stream.writeTextElement("priority", QString::number(sp.getPriority()));
+      //stream.writeTextElement("priority", QString::number(sp.getPriority()));
       break;
     case QoS_Feedback:
       stream.writeAttribute("name", "QoS_Feedback");
+
+      if (sp.getPath().length() > 0) {
+        stream.writeTextElement("path", sp.getPath());
+        stream.writeTextElement("args", sp.getArgs());
+      }
+
       stream.writeTextElement("responsetime", QString::number(sp.getResponseTime()));
       break;
     default: break;
