@@ -1,176 +1,110 @@
+#include <QDebug>
+
 #include "xmlmanager.hpp"
 
+#include <QDomDocument>
 #include <QXmlStreamWriter>
-#include <QXmlStreamReader>
 
-void parseFeedback(QXmlStreamReader &xml, SchedParameter &sp)
+void parseXML(QDomDocument &xml, ExperimentParameter &sp)
 {
-  qDebug("Found QoS_Feedback Configuration");
+    QDomElement docElem = xml.documentElement();
 
-  bool setResponseTime = false;
-  bool setPath = false;
-  bool setArgs = false;
+    sp.setParallel(docElem.attribute("proc", "4").toLong());
+    sp.setRuns(docElem.attribute("runs", "100").toLong());
 
-  sp.setType(QoS_Feedback);
-  while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
-           xml.name() == "SchedulingAlgorithm")) {
-    if(xml.tokenType() == QXmlStreamReader::StartElement) {
-      if (xml.name() == "responsetime") {
-        xml.readNext();
-        sp.setResponseTime(xml.text().toString().toLong());
-        setResponseTime = true;
-      } else if (xml.name() == "path") {
-        xml.readNext();
-        sp.setPath(xml.text().toString());
-        setPath = true;
-      } else if (xml.name() == "args") {
-        xml.readNext();
-        sp.setArgs(xml.text().toString());
-        setArgs = true;
-      }
+    qDebug() << "Proc values:" << sp.getParallelization();
+    qDebug() << "Runs values:" << sp.getRuns();
+
+    QDomNode n = docElem.firstChild();
+    while(!n.isNull()) {
+        QDomElement e = n.toElement(); // try to convert the node to an element.
+        if(!e.isNull()) {
+
+            if (e.tagName() == "period") {
+                sp.setPeriod(e.text().toLong());
+                qDebug() << "Trovato Period, che vale " << e.text(); // the node really is an element.
+            }
+        }
+        n = n.nextSibling();
     }
-    xml.readNext();
-  }
-
-  if (!setResponseTime)
-    sp.setResponseTime(0);
-  if (!setPath)
-    sp.setPath("");
-  if (!setArgs)
-    sp.setArgs("");
-
-  sp.isValid(true);
+/*
+*/
+    /*
+    while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
+             xml.name() == "simulation")) {
+        if(xml.tokenType() == QXmlStreamReader::StartElement) {
+            if (xml.name() == "runs") {
+                xml.readNext();
+                sp.setRuns(xml.text().toString().toLong());
+                setRuns = true;
+            } else if (xml.name() == "proc") {
+                xml.readNext();
+                sp.setParallilation(xml.text().toString().toLong());
+                setParallelization = true;
+            }/* else if (xml.name() == "deadline") {
+                xml.readNext();
+                sp.setDeadline(xml.text().toString().toLong());
+                setDeadline = true;
+                //} else if (xml.name() == "priority") {
+                //  xml.readNext();
+                //  sp.setPriority(xml.text().toString().toLong());
+                //  setPriority = true;
+            } else if (xml.name() == "path") {
+                xml.readNext();
+                sp.setPath(xml.text().toString());
+                setPath = true;
+            } else if (xml.name() == "args") {
+                xml.readNext();
+                sp.setArgs(xml.text().toString());
+                setArgs = true;
+            }
+        }
+        xml.readNext();
+    }
+    /*
+    if (!setPeriod)
+        sp.setPeriod(0);
+    if (!setDeadline)
+        sp.setDeadline(0);
+    if (!setRunTime)
+        sp.setRunTime(0);
+    if (!setPath)
+        sp.setPath("");
+    if (!setArgs)
+        sp.setArgs("");
+*/
+    sp.isValid(true);
 }
 
-void parseDL(QXmlStreamReader &xml, SchedParameter &sp)
+ExperimentParameter parseXMLString(const QString &str)
 {
-  qDebug("Found SCHED_DEADLINE Configuration");
+    ExperimentParameter sp;
+    QDomDocument xml;
+    xml.setContent(str);
 
-  bool setPeriod = false;
-  bool setDeadline = false;
-  bool setRunTime = false;
-  bool setPath = false;
-  bool setArgs = false;
+    parseXML(xml, sp);
 
-  sp.setType(SCHED_DEADLINE);
-  while (!(xml.tokenType() == QXmlStreamReader::EndElement &&
-           xml.name() == "SchedulingAlgorithm")) {
-    if(xml.tokenType() == QXmlStreamReader::StartElement) {
-      if (xml.name() == "period") {
-        xml.readNext();
-        sp.setPeriod(xml.text().toString().toLong());
-        setPeriod = true;
-      } else if (xml.name() == "runtime") {
-        xml.readNext();
-        sp.setRunTime(xml.text().toString().toLong());
-        setRunTime = true;
-      } else if (xml.name() == "deadline") {
-        xml.readNext();
-        sp.setDeadline(xml.text().toString().toLong());
-        setDeadline = true;
-        //} else if (xml.name() == "priority") {
-        //  xml.readNext();
-        //  sp.setPriority(xml.text().toString().toLong());
-        //  setPriority = true;
-      } else if (xml.name() == "path") {
-        xml.readNext();
-        sp.setPath(xml.text().toString());
-        setPath = true;
-      } else if (xml.name() == "args") {
-        xml.readNext();
-        sp.setArgs(xml.text().toString());
-        setArgs = true;
-      }
-    }
-    xml.readNext();
-  }
-
-  if (!setPeriod)
-    sp.setPeriod(0);
-  if (!setDeadline)
-    sp.setDeadline(0);
-  if (!setRunTime)
-    sp.setRunTime(0);
-  if (!setPath)
-    sp.setPath("");
-  if (!setArgs)
-    sp.setArgs("");
-
-  sp.isValid(true);
+    return sp;
 }
 
-SchedParameter parseXMLString(const QString &str)
+QString constructXMLString(const ExperimentParameter &sp)
 {
-  SchedParameter sp;
-  QXmlStreamReader xml(str);
+    QString xmlString;
+    QXmlStreamWriter stream(&xmlString);
 
-  while (!xml.atEnd()) {
-    QXmlStreamReader::TokenType token = xml.readNext();
+    stream.setAutoFormatting(true);
 
-    if(token == QXmlStreamReader::StartDocument) {
-      continue;
-    }
+    stream.writeStartDocument();
+    stream.writeStartElement("simulator");
 
-    if(token == QXmlStreamReader::StartElement) {
+    stream.writeAttribute("type", "FPGA");
+    stream.writeAttribute("proc", QString::number(sp.getParallelization()));
+    stream.writeAttribute("runs", QString::number(sp.getRuns()));
 
-      if(xml.name() == "SchedulingAlgorithm") {
-        if (xml.attributes().value("name") == "SCHED_DEADLINE")
-          parseDL(xml, sp);
-        else if (xml.attributes().value("name") == "QoS_Feedback")
-          parseFeedback(xml, sp);
-      }
-    }
-  }
-  if (xml.hasError()) {
-    //if (xml.error() == QXmlStreamReader::NotWellFormedError)
-    //    ui->statusbar->showMessage(tr("XML Document is not well-formed"));
-    sp.isValid(false);
-  } else {
-    //ui->statusbar->showMessage(tr("XML Modifications updated"));
-  }
+    stream.writeTextElement("period", QString::number(sp.getPeriod()));
 
-  return sp;
-}
+    stream.writeEndElement();
+    stream.writeEndDocument();
 
-QString constructXMLString(const SchedParameter &sp)
-{
-  QString xmlString;
-  QXmlStreamWriter stream(&xmlString);
-
-  stream.setAutoFormatting(true);
-
-  stream.writeStartDocument();
-  stream.writeStartElement("SchedulingAlgorithm");
-
-  switch (sp.getType()) {
-    case SCHED_DEADLINE:
-      stream.writeAttribute("name", "SCHED_DEADLINE");
-
-      if (sp.getPath().length() > 0) {
-        stream.writeTextElement("path", sp.getPath());
-        stream.writeTextElement("args", sp.getArgs());
-      }
-
-      stream.writeTextElement("period", QString::number(sp.getPeriod()));
-      stream.writeTextElement("deadline", QString::number(sp.getDeadline()));
-      stream.writeTextElement("runtime", QString::number(sp.getRunTime()));
-      //stream.writeTextElement("priority", QString::number(sp.getPriority()));
-      break;
-    case QoS_Feedback:
-      stream.writeAttribute("name", "QoS_Feedback");
-
-      if (sp.getPath().length() > 0) {
-        stream.writeTextElement("path", sp.getPath());
-        stream.writeTextElement("args", sp.getArgs());
-      }
-
-      stream.writeTextElement("responsetime", QString::number(sp.getResponseTime()));
-      break;
-    default: break;
-  }
-
-  stream.writeEndElement();
-  stream.writeEndDocument();
-
-  return xmlString;
+    return xmlString;
 }

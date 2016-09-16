@@ -5,7 +5,7 @@
 
 #include "types.hpp"
 
-SchedParameter parseXMLString(const QString &str);
-QString constructXMLString(const SchedParameter &sp);
+ExperimentParameter parseXMLString(const QString &str);
+QString constructXMLString(const ExperimentParameter &sp);
 
 #endif // XMLMANAGER_H

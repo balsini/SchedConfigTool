@@ -4,9 +4,10 @@
 #
 #-------------------------------------------------
 
-QT      += core\
-        gui\
-        widgets\
+QT      += core \
+        xml \
+        gui \
+        widgets \
         xmlpatterns
 
 
@@ -14,18 +15,16 @@ TARGET = SchedConfigTool
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
+SOURCES += main.cpp \
         mainwindow.cpp \
     xmlmanager.cpp \
-    aboutwindow.cpp \
-    jsonmanager.cpp
+    aboutwindow.cpp
 
 HEADERS  += \
     types.hpp \
     xmlmanager.hpp \
     mainwindow.h \
-    aboutwindow.h \
-    jsonmanager.hpp
+    aboutwindow.h
 
 FORMS    += mainwindow.ui \
     aboutwindow.ui

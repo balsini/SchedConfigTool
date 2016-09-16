@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "xmlmanager.hpp"
-#include "jsonmanager.hpp"
 
 #include <QDebug>
 #include <QXmlSchema>
@@ -17,18 +16,16 @@ MainWindow::MainWindow(QWidget *parent) :
 
   about.hide();
 
-  ui->lineEditDeadline->setValidator(new QIntValidator(this));
-  ui->lineEditPeriod->setValidator(new QIntValidator(this));
-  ui->lineEditResponseTime->setValidator(new QIntValidator(this));
-  ui->lineEditRunTime->setValidator(new QIntValidator(this));
+  ui->lineEditParallelization->setValidator(new QIntValidator(this));
+  ui->lineEditRuns->setValidator(new QIntValidator(this));
   //ui->lineEditPriority->setValidator(new QIntValidator(this));
 
   ui->plainEditorTab->setCurrentIndex(0);
-  ui->Algorithm->setCurrentIndex(0);
-  emit ui->Algorithm->currentChanged(0);
 
   filename = "";
   updateTitle();
+
+  changedParameter();
 }
 
 MainWindow::~MainWindow()
@@ -38,70 +35,37 @@ MainWindow::~MainWindow()
 
 void MainWindow::changedParameter()
 {
-  SchedParameter sp;
-  switch (ui->Algorithm->currentIndex()) {
-    case 0:
-      sp.setParam(ui->lineEditPeriod->text().toLong(),
-                  ui->lineEditDeadline->text().toLong(),
-                  ui->lineEditRunTime->text().toLong(),
-                  ui->lineEditPath->text(),
-                  ui->lineEditArgs->text());
-      break;
-    default:
-      sp.setParam(ui->lineEditResponseTime->text().toLong(),
-                  ui->lineEditPath->text(),
-                  ui->lineEditArgs->text());
-  }
+    qDebug() << "changedParameter()";
 
+  ExperimentParameter sp;
+
+  sp.setParallel(ui->lineEditParallelization->text().toLong());
+  sp.setRuns(ui->lineEditRuns->text().toLong());
+  sp.setPeriod(ui->lineEditPeriod->text().toLong());
+
+  /*
+      sp.setParam(ui->lineEditParallelization->text().toLong(),
+                  ui->lineEditRuns->text().toLong());
+                  */
   ui->plainXMLEditor->setPlainText(constructXMLString(sp));
-  ui->plainJSONEditor->setPlainText(constructJSONString(sp));
 }
 
-void MainWindow::updateGUIParameters(const SchedParameter &sp)
+void MainWindow::updateGUIParameters(const ExperimentParameter &sp)
 {
   qDebug() << "Updating GUI parameters";
 
   if (sp.isValid()) {
-    switch(sp.getType()) {
-      case SCHED_DEADLINE:
-
-        std::cout << sp;
-
-        ui->lineEditDeadline->setText(QString::number(sp.getDeadline()));
+        ui->lineEditParallelization->setText(QString::number(sp.getParallelization()));
+        ui->lineEditRuns->setText(QString::number(sp.getRuns()));
         ui->lineEditPeriod->setText(QString::number(sp.getPeriod()));
-        ui->lineEditRunTime->setText(QString::number(sp.getRunTime()));
-        //ui->lineEditPriority->setText(QString::number(sp.getPriority()));
-        ui->lineEditPath->setText(sp.getPath());
-        ui->lineEditArgs->setText(sp.getArgs());
-
-        ui->Algorithm->setCurrentIndex(0);
-        break;
-      case QoS_Feedback:
-
-        std::cout << sp;
-
-        ui->lineEditResponseTime->setText(QString::number(sp.getResponseTime()));
-        ui->lineEditPath->setText(sp.getPath());
-        ui->lineEditArgs->setText(sp.getArgs());
-        ui->Algorithm->setCurrentIndex(1);
-        break;
-      default: break;
-    }
   }
 }
 
 void MainWindow::changedXML()
 {
   qDebug() << "changedXML()";
-  if (validXML())
-    updateGUIParameters(parseXMLString(ui->plainXMLEditor->toPlainText()));
-}
-
-void MainWindow::changedJSON()
-{
-  qDebug() << "changedJSON()";
-  if (validJSON())
-    updateGUIParameters(parseJSONString(ui->plainJSONEditor->toPlainText()));
+  //if (validXML())
+  updateGUIParameters(parseXMLString(ui->plainXMLEditor->toPlainText()));
 }
 
 void MainWindow::on_actionQuit_triggered()
@@ -123,6 +87,7 @@ bool MainWindow::validJSON()
   return true;
 }
 
+/*
 bool MainWindow::validXML()
 {
   QFile schemaFile(":/xsd/schema.xsd");
@@ -165,6 +130,7 @@ bool MainWindow::validXML()
 
   return !errorOccurred;
 }
+*/
 
 void MainWindow::moveCursor(int line, int column)
 {
@@ -231,8 +197,6 @@ void MainWindow::saveTo(const QString &tmpfilename) {
 
     if (tmpfilename.right(4) == ".xml")
       openFile.write(ui->plainXMLEditor->toPlainText().toUtf8());
-    else if (tmpfilename.right(5) == ".json")
-      openFile.write(ui->plainJSONEditor->toPlainText().toUtf8());
 
     updateTitle();
     openFile.close();

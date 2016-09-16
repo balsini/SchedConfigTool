@@ -23,13 +23,12 @@ class MainWindow : public QMainWindow
   bool validXML();
   bool validJSON();
   void moveCursor(int line, int column);
-  void updateGUIParameters(const SchedParameter &sp);
+  void updateGUIParameters(const ExperimentParameter &sp);
   void saveTo(const QString &filename);
 
 private slots:
   void changedParameter();
   void changedXML();
-  void changedJSON();
   void on_actionQuit_triggered();
   void on_actionAbout_triggered();
 
